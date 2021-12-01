@@ -3,6 +3,10 @@
 #include <map>
 
 using namespace std;
+
+
+struct IEvento{};
+
 class Evento{
     private:
    Evento* evento ;
@@ -13,18 +17,15 @@ class Evento{
 
 };
 
-
-class IState;
 class State;
 class Accion;
-class IProcess{
-    public:
+
+struct IProcess{
     virtual bool procesarEvento(Evento*)= 0;
     virtual~IProcess(){};
 };
 
-class ICorrespondenciaEstado{
-    public:
+struct ICorrespondenciaEstado{
     virtual Accion* buscaAccion(State*)=0;
     virtual ~ICorrespondenciaEstado(){};
 };
@@ -47,8 +48,7 @@ Accion* CorrespondenciaEstado::buscaAccion(State*){
 
 
 
-class IAccion{
-    public:
+struct IAccion{
     virtual Accion* getAccion(State*)= 0;
     virtual ~IAccion(){};
 };
@@ -73,14 +73,12 @@ return  corresponde->buscaAccion(estado);
 class Guarda;
 
 
-class IFSM: public IProcess{
-public:
+struct IFSM: public IProcess{
     virtual State* cambioEstado(Evento*evento,State*estado)=0;
     virtual~IFSM(){};
 };
 
-class IGuarda{
-    public:
+struct IGuarda{
     virtual bool evaluarGuarda(Evento* ,State* )= 0;
     virtual~IGuarda(){};
 };
@@ -102,10 +100,13 @@ bool Guarda::evaluarGuarda(Evento* evento,State* estado){
 return true;
 }
 
+struct IState : public IProcess {
+    virtual  void manifestarEfecto(State*)= 0;
+    virtual ~IState(){};
+};
 
 
-class IPersistencia{
-public:
+struct IPersistencia{
     virtual void persisteEstado(IState*)= 0;
     virtual ~IPersistencia(){};
 };
@@ -125,12 +126,6 @@ void Persistencia::persisteEstado(IState*){
     // carga en un archivo  el ultimo estado
 }
 
-
-class IState:public IProcess{
-public:
-    virtual  void manifestarEfecto(State*)= 0;
-    virtual ~IState(){};
-};
 
 class State : public IState{
     private:
@@ -170,8 +165,7 @@ doing->getAccion(estado);
 
 }
 
-class IRules{
-public:
+struct IRules{
     virtual State* getValue ( Evento* value,State* key)=0;
     virtual~IRules(){};
 };
@@ -194,8 +188,7 @@ State* Rules<State, Evento>::getValue( Evento* value,State* key){
         return nuevoEstado;
 }
 
-class ITransicion{
-public:
+struct ITransicion{
     virtual State* dispararTransicion(Evento*,State*)= 0;
     virtual ~ITransicion(){};
 };
